@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField, PasswordField, BooleanField
-from wtforms.validators import DataRequired, Length, EqualTo
+from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
+from socialmedia.models import User
 
 
 class PostCreationForm(FlaskForm):
@@ -30,6 +31,16 @@ class UserCreationForm(FlaskForm):
     ])
     submit = SubmitField('Submit')
 
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError('User already exists. Please select another')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError('User already exists. Please select another')
+
 
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[
@@ -40,4 +51,3 @@ class LoginForm(FlaskForm):
     ])
     remember = BooleanField('Remember me')
     submit = SubmitField('Login')
-
