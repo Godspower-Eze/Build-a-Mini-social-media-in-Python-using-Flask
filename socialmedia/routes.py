@@ -3,6 +3,7 @@ from flask import render_template, flash, redirect, url_for
 from socialmedia.models import User, Post
 from socialmedia.forms import PostCreationForm, UserCreationForm, LoginForm
 from socialmedia import bcrypt
+from flask_login import login_user
 
 
 @app.route('/')
@@ -42,4 +43,12 @@ def register_user():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            flash('You have logged in successfully', 'success')
+            login_user(user, remember=form.remember.data)
+            return redirect(url_for('home'))
+        else:
+            flash('Invalid Credentials', 'danger')
     return render_template('login.html', form=form)
