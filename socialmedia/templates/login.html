@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+    <form role="form" class="container form-horizontal" method="POST" action="" >
+        {{ form.hidden_tag() }}
+        <fieldset>
+            <div class="row">
+                <div class="col-md-8 pd-10">
+                <legend>
+                    Login
+                </legend>
+                    <div class="form-group">
+                    {{ form.email.label(class="form-control-label")}}
+                    {{ form.email(class="form-control")}}
+                    </div>
+                    <div class="form-group">
+                    {{ form.password.label(class="form-control-label")}}
+                    {{ form.password(class="form-control")}}
+                    </div>
+                    <div>
+                        {{ form.submit(class="btn btn-info btn-lg")}}
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+{% endblock %}

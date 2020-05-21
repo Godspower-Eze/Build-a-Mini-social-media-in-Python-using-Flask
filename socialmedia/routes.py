@@ -1,7 +1,8 @@
 from socialmedia import app, db
-from flask import render_template, flash, redirect
+from flask import render_template, flash, redirect, url_for
 from socialmedia.models import User, Post
-from socialmedia.forms import PostCreationForm, UserCreationForm
+from socialmedia.forms import PostCreationForm, UserCreationForm, LoginForm
+from socialmedia import bcrypt
 
 
 @app.route('/')
@@ -21,11 +22,24 @@ def post_create():
         db.session.add(create)
         db.session.commit()
         flash('You have successfully created a new post', 'success')
-        return redirect('home')
+        return redirect(url_for('home'))
     return render_template('create_post.html', title='Create Post', form=form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_user():
     form = UserCreationForm()
+    if form.validate_on_submit():
+        hashed_pasword = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user = User(username=form.username.data, email=form.email.data, password=hashed_pasword)
+        db.session.add(user)
+        db.session.commit()
+        flash('You have successfully created an account. You can now login', 'success')
+        return redirect(url_for('login'))
     return render_template('register.html', form=form, title='Register')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    return render_template('login.html', form=form)
