@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>
-    Home
+<h1 class="container">
+    Posts
 </h1>
-<div>
     {% for p in post %}
-    <div>
-        <h3>{{ p.post_title}}</h3>
-    </div>
-    <div>
-        <p>{{ p.post_content }}</p>
-    </div>
+    <div class="container bg-info">
+        <small class="text-right"><img class="rounded-circle pr-2 pt-2" width="50px" src="{{ url_for('static', filename='mypicture.jpg')}}">By {{p.author.username}}</small>
+    <h3>{{ p.post_title}}</h3>
+        <hr color="black">
+    <p class="lead">
+        {{ p.post_content }}
+    </p>
+     </div>
     {% endfor %}
-</div>
 {% endblock %}
