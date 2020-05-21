@@ -50,14 +50,14 @@
         </form>
       </div>
     </nav>
-        <div>
+        <div class="mt-2">
         {% with messages = get_flashed_messages(with_categories=true)%}
             {% if messages %}
-              {% if category, message in messages %}
-                  <div class="alert alert-success">
+              {% for category, message in messages %}
+                  <div class="alert alert-{{category}}">
                     {{message}}
                   </div>
-              {% endif %}
+              {% endfor %}
             {% endif %}
         {% endwith %}
     </div>
