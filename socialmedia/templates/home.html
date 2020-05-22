@@ -6,7 +6,7 @@
     {% for p in post %}
     <div class="container bg-info">
         <small class="text-right"><img class="rounded-circle pr-2 pt-2" width="50px" src="{{ url_for('static', filename='mypicture.jpg')}}">By {{p.author.username}}</small>
-    <h3>{{ p.post_title}}</h3>
+        <h3><a href="{{ url_for('detail_view', user_id=p.id)}}">{{ p.post_title}}</a></h3>
         <hr color="black">
     <p class="lead">
         {{ p.post_content }}
