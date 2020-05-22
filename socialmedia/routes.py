@@ -71,7 +71,9 @@ def logout():
 @app.route('/account')
 @login_required
 def account():
-    return render_template('account.html', title=current_user.username + ' ' + 'Account')
+    form = UserCreationForm()
+    profile_image = url_for('static', filename='profile_image/' + current_user.profile_image)
+    return render_template('account.html', title=current_user.username + ' ' + 'Account', profile_image=profile_image, form=form)
 
 
 @app.route('/detail/<int:user_id>')
@@ -108,6 +110,3 @@ def delete(post_id):
     db.session.commit()
     flash('You have deleted the post successfully', 'danger')
     return redirect(url_for('home'))
-
-
-

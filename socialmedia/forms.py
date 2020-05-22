@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField, PasswordField, BooleanField
+from wtforms import StringField, TextAreaField, SubmitField, PasswordField, BooleanField, SelectField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
 from socialmedia.models import User
 
@@ -12,6 +12,12 @@ class PostCreationForm(FlaskForm):
         DataRequired()
     ])
     submit = SubmitField('Post')
+
+
+choices = (
+    ('male', 'Male'),
+    ('female', 'Female')
+)
 
 
 class UserCreationForm(FlaskForm):
@@ -29,6 +35,10 @@ class UserCreationForm(FlaskForm):
         DataRequired(),
         EqualTo('password')
     ])
+    first_name = StringField('First Name')
+    last_name = StringField('Last Name')
+    gender = SelectField('Gender', choices=choices)
+    bio = TextAreaField('Bio')
     submit = SubmitField('Submit')
 
     def validate_username(self, username):
@@ -51,5 +61,3 @@ class LoginForm(FlaskForm):
     ])
     remember = BooleanField('Remember me')
     submit = SubmitField('Login')
-
-
