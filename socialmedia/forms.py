@@ -3,6 +3,11 @@ from wtforms import StringField, TextAreaField, SubmitField, PasswordField, Bool
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
 from socialmedia.models import User
 
+choices = (
+    ('male', 'Male'),
+    ('female', 'Female')
+)
+
 
 class PostCreationForm(FlaskForm):
     post_title = StringField('Title', validators=[
@@ -12,12 +17,6 @@ class PostCreationForm(FlaskForm):
         DataRequired()
     ])
     submit = SubmitField('Post')
-
-
-choices = (
-    ('male', 'Male'),
-    ('female', 'Female')
-)
 
 
 class UserCreationForm(FlaskForm):
@@ -35,10 +34,6 @@ class UserCreationForm(FlaskForm):
         DataRequired(),
         EqualTo('password')
     ])
-    first_name = StringField('First Name')
-    last_name = StringField('Last Name')
-    gender = SelectField('Gender', choices=choices)
-    bio = TextAreaField('Bio')
     submit = SubmitField('Submit')
 
     def validate_username(self, username):
@@ -61,3 +56,25 @@ class LoginForm(FlaskForm):
     ])
     remember = BooleanField('Remember me')
     submit = SubmitField('Login')
+
+
+class AccountInfo(FlaskForm):
+    first_name = StringField('First name')
+    last_name = StringField('Last Name')
+    gender = SelectField('Gender', choices=choices)
+    bio = TextAreaField('Bio')
+    submit = SubmitField('Submit')
+    username = StringField('Username', validators=[
+        DataRequired(),
+        Length(min=2, max=20)
+    ])
+    email = StringField('Email', validators=[
+        DataRequired()
+    ])
+    password = PasswordField('Password', validators=[
+        DataRequired()
+    ])
+    confirm_password = PasswordField('Confirm Password', validators=[
+        DataRequired(),
+        EqualTo('password')
+    ])

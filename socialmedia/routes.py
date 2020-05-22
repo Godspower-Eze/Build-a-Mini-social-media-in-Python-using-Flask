@@ -1,7 +1,7 @@
 from socialmedia import app, db
 from flask import render_template, flash, redirect, url_for, request, abort
 from socialmedia.models import User, Post
-from socialmedia.forms import PostCreationForm, UserCreationForm, LoginForm
+from socialmedia.forms import PostCreationForm, UserCreationForm, LoginForm, AccountInfo
 from socialmedia import bcrypt
 from flask_login import login_user, logout_user, current_user, login_required
 
@@ -68,11 +68,29 @@ def logout():
     return redirect(url_for('home'))
 
 
-@app.route('/account')
+@app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
-    form = UserCreationForm()
+    user = User.query.get(current_user.id)
+    form = AccountInfo()
     profile_image = url_for('static', filename='profile_image/' + current_user.profile_image)
+    if request.method == 'POST':
+        user.first_name = form.first_name.data
+        user.last_name = form.last_name.data
+        user.bio = form.bio.data
+        user.gender = form.gender.data
+        user.email = form.email.data
+        user.username = form.username.data
+        db.session.commit()
+        flash('You have successfully updated your profile', 'success')
+        return redirect(url_for('account'))
+    elif request.method == 'GET':
+        form.first_name.data = user.first_name
+        form.last_name.data = user.last_name
+        form.bio.data = user.bio
+        form.gender.data = user.gender
+        form.email.data = user.email
+        form.username.data = user.username
     return render_template('account.html', title=current_user.username + ' ' + 'Account', profile_image=profile_image, form=form)
 
 
