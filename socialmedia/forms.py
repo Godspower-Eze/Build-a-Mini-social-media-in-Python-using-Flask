@@ -1,5 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField, PasswordField, BooleanField, SelectField
+from wtforms import (StringField,
+                     TextAreaField,
+                     SubmitField,
+                     PasswordField,
+                     BooleanField,
+                     SelectField,)
+from flask_wtf.file import FileField, FileAllowed
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
 from socialmedia.models import User
 
@@ -77,4 +83,7 @@ class AccountInfo(FlaskForm):
     confirm_password = PasswordField('Confirm Password', validators=[
         DataRequired(),
         EqualTo('password')
+    ])
+    profile_image = FileField('Profile Picture', validators=[
+        FileAllowed(['jpg.png'])
     ])
