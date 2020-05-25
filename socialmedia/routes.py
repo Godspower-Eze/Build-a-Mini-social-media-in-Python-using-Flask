@@ -4,6 +4,26 @@ from socialmedia.models import User, Post
 from socialmedia.forms import PostCreationForm, UserCreationForm, LoginForm, AccountInfo
 from socialmedia import bcrypt
 from flask_login import login_user, logout_user, current_user, login_required
+import secrets
+import os
+
+
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/profile_image', picture_fn)
+    form_picture.save(picture_path)
+    return picture_fn
+
+
+def postsave_picture(post_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(post_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/post_image', picture_fn)
+    post_picture.save(picture_path)
+    return picture_fn
 
 
 @app.route('/')
@@ -17,7 +37,18 @@ def home():
 @login_required
 def post_create():
     form = PostCreationForm()
-    if form.validate_on_submit():
+    # profile_image = url_for('static', filename='post_image/' + current_user.)
+    if form.validate_on_submit() and form.post_image.data:
+        picture_file = postsave_picture(form.post_image.data)
+        post_image = picture_file
+        post_title = form.post_title.data
+        post_content = form.post_content.data
+        create = Post(post_image=post_image, post_title=post_title, post_content=post_content, user_id=current_user.id)
+        db.session.add(create)
+        db.session.commit()
+        flash('You have successfully created a new post', 'success')
+        return redirect(url_for('home'))
+    elif form.validate_on_submit():
         post_title = form.post_title.data
         post_content = form.post_content.data
         create = Post(post_title=post_title, post_content=post_content, user_id=current_user.id)
@@ -74,6 +105,10 @@ def account():
     user = User.query.get(current_user.id)
     form = AccountInfo()
     profile_image = url_for('static', filename='profile_image/' + current_user.profile_image)
+    if form.profile_image.data:
+        picture_file = save_picture(form.profile_image.data)
+        current_user.profile_image = picture_file
+
     if request.method == 'POST':
         user.first_name = form.first_name.data
         user.last_name = form.last_name.data
@@ -91,7 +126,8 @@ def account():
         form.gender.data = user.gender
         form.email.data = user.email
         form.username.data = user.username
-    return render_template('account.html', title=current_user.username + ' ' + 'Account', profile_image=profile_image, form=form)
+    return render_template('account.html', title=current_user.username + ' ' + 'Account', profile_image=profile_image,
+                           form=form)
 
 
 @app.route('/detail/<int:user_id>')

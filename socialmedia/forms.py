@@ -4,7 +4,7 @@ from wtforms import (StringField,
                      SubmitField,
                      PasswordField,
                      BooleanField,
-                     SelectField,)
+                     SelectField, )
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
 from socialmedia.models import User
@@ -22,6 +22,10 @@ class PostCreationForm(FlaskForm):
     post_content = TextAreaField('Content', validators=[
         DataRequired()
     ])
+    post_image = FileField('Profile Picture', validators=[
+        FileAllowed(['jpg', 'png'])
+    ])
+
     submit = SubmitField('Post')
 
 
@@ -85,5 +89,5 @@ class AccountInfo(FlaskForm):
         EqualTo('password')
     ])
     profile_image = FileField('Profile Picture', validators=[
-        FileAllowed(['jpg.png'])
+        FileAllowed(['jpg', 'png'])
     ])
