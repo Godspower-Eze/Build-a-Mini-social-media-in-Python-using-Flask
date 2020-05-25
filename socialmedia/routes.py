@@ -37,7 +37,6 @@ def home():
 @login_required
 def post_create():
     form = PostCreationForm()
-    # profile_image = url_for('static', filename='post_image/' + current_user.)
     if form.validate_on_submit() and form.post_image.data:
         picture_file = postsave_picture(form.post_image.data)
         post_image = picture_file
