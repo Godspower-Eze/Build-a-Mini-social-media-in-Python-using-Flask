@@ -6,31 +6,49 @@ from socialmedia import bcrypt
 from flask_login import login_user, logout_user, current_user, login_required
 import secrets
 import os
+from PIL import Image
+
+thumnail_size = (300, 300)
 
 
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(form_picture.filename)
+    print(form_picture.filename)
     picture_fn = random_hex + f_ext
     picture_path = os.path.join(app.root_path, 'static/profile_image', picture_fn)
-    form_picture.save(picture_path)
+    image = Image.open(form_picture)
+    image.thumbnail(thumnail_size)
+    image.save(picture_path)
     return picture_fn
 
 
 def postsave_picture(post_picture):
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(post_picture.filename)
+    print(post_picture.filename)
     picture_fn = random_hex + f_ext
     picture_path = os.path.join(app.root_path, 'static/post_image', picture_fn)
-    post_picture.save(picture_path)
+    image = Image.open(post_picture)
+    image.thumbnail(thumnail_size)
+    image.save(picture_path)
     return picture_fn
 
 
 @app.route('/')
 @app.route('/home')
 def home():
-    post = Post.query.all()
+    page = request.args.get('page', 1, type=int)
+    post = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=1)
     return render_template('home.html', post=post, title='Home')
+
+
+@app.route('/user_posts/<string:username>', methods=['GET', 'POST'])
+def user_post(username):
+    page = request.args.get('page', 1, type=int)
+    user = User.query.filter_by(username=username).first_or_404()
+    posts = Post.query.filter_by(author=user).order_by(Post.date_posted.desc()).paginate(page=page, per_page=1)
+    return render_template('user.html', title=f"{user.username} Posts", posts=posts, user=user)
 
 
 @app.route('/createpost', methods=['GET', 'POST'])
