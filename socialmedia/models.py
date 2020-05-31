@@ -1,6 +1,8 @@
 from socialmedia import db, login_manager
 from datetime import datetime
 from flask_login import UserMixin
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from socialmedia import app
 
 
 @login_manager.user_loader
@@ -22,6 +24,19 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
+
+    def get_reset_token(self, expires=1800):
+        s = Serializer(app.config['SECRET_KEY'], expires_in=expires)
+        return s.dumps({'user_id': self.id}).decode('utf-8')
+
+    @staticmethod
+    def verify_token(token):
+        s = Serializer(app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
 
 
 class Post(db.Model):

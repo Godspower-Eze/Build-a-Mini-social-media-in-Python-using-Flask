@@ -1,14 +1,30 @@
-from socialmedia import app, db
+from socialmedia import app, db, mail
 from flask import render_template, flash, redirect, url_for, request, abort
 from socialmedia.models import User, Post
-from socialmedia.forms import PostCreationForm, UserCreationForm, LoginForm, AccountInfo
+from socialmedia.forms import (PostCreationForm,
+                               UserCreationForm,
+                               LoginForm,
+                               AccountInfo,
+                               RequestChangePassword,
+                               ChangePasswordFormFromToken)
 from socialmedia import bcrypt
 from flask_login import login_user, logout_user, current_user, login_required
 import secrets
 import os
 from PIL import Image
+from flask_mail import Message
 
 thumnail_size = (300, 300)
+
+
+def send_reset_token(user):
+    token = user.get_reset_token()
+    msg = Message('Password reset email',
+                  sender='noreply@demo.com',
+                  recipients=[user.email])
+    msg.body = f"{url_for('reset_token', token=token, _external=True)}" \
+               f"if you did not not request for this please ignore"
+    mail.send(msg)
 
 
 def save_picture(form_picture):
@@ -181,3 +197,38 @@ def delete(post_id):
     db.session.commit()
     flash('You have deleted the post successfully', 'danger')
     return redirect(url_for('home'))
+
+
+@app.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    form = RequestChangePassword
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user is None:
+            flash('User does not exist', 'danger')
+            return redirect(url_for('reset_password'))
+        send_reset_token(user)
+        flash('Your reset link has being sent to the given email', 'success')
+        return redirect(url_for('login'))
+    render_template('request_change_password.html', title='Request Reset', form=form)
+
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_token(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    user = User.verify_token(token)
+    if user is None:
+        flash('That is an invalid token or expired', 'warning')
+        return redirect(url_for('reset_request'))
+    form = ChangePasswordFormFromToken
+    if form.validate_on_submit():
+        new_password = form.new_password.data
+        confirm_password = form.confirm_password.data
+        if new_password == confirm_password:
+            new_hash = bcrypt.generate_password_hash(new_password)
+            user.password = new_hash
+            db.session.commit()
+    return render_template('reset_token.html', form=form, title='Reset Password')

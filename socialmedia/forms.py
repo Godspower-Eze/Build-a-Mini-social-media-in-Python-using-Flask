@@ -6,7 +6,7 @@ from wtforms import (StringField,
                      BooleanField,
                      SelectField, )
 from flask_wtf.file import FileField, FileAllowed
-from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, Email
 from socialmedia.models import User
 
 choices = (
@@ -35,7 +35,8 @@ class UserCreationForm(FlaskForm):
         Length(min=2, max=20)
     ])
     email = StringField('Email', validators=[
-        DataRequired()
+        DataRequired(),
+        Email()
     ])
     password = PasswordField('Password', validators=[
         DataRequired()
@@ -59,7 +60,8 @@ class UserCreationForm(FlaskForm):
 
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[
-        DataRequired()
+        DataRequired(),
+        Email()
     ])
     password = PasswordField('Password', validators=[
         DataRequired()
@@ -79,7 +81,8 @@ class AccountInfo(FlaskForm):
         Length(min=2, max=20)
     ])
     email = StringField('Email', validators=[
-        DataRequired()
+        DataRequired(),
+        Email()
     ])
     password = PasswordField('Password', validators=[
         DataRequired()
@@ -91,3 +94,28 @@ class AccountInfo(FlaskForm):
     profile_image = FileField('Profile Picture', validators=[
         FileAllowed(['jpg', 'png'])
     ])
+
+
+class RequestChangePassword(FlaskForm):
+    email = StringField('Email Address', validators=[
+        DataRequired(),
+        Email()
+    ])
+    submit = SubmitField('Send reset link')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email).first()
+        if user is None:
+            return ValidationError('Email does not exist')
+        return user
+
+
+class ChangePasswordFormFromToken(FlaskForm):
+    new_password = PasswordField('New Password', validators=[
+        DataRequired()
+    ])
+    confirm_password = PasswordField('Confirm Password', validators=[
+        DataRequired(),
+        EqualTo('new_password')
+    ])
+    submit = SubmitField('Reset Password')
