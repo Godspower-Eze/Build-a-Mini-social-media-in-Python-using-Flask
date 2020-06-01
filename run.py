@@ -1,4 +1,6 @@
-from socialmedia import app
+from socialmedia import create_app
+
+app = create_app()
 
 if __name__ == '__main__':
     app.run(debug=True)

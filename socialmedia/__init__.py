@@ -4,32 +4,48 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
 
-app = Flask(__name__)
+from socialmedia.config import Config
 
-app.config['SECRET_KEY'] = '222997886598bf047d5bd0fabb518b583900433e6f284448ffa1b5e60201a35e'
+login_manager = LoginManager()
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///socialmedia.db'
-
-db = SQLAlchemy(app)
-
-bcrypt = Bcrypt(app)
-
-login_manager = LoginManager(app)
-
-login_manager.login_view = 'login'
+login_manager.login_view = 'users.login'
 
 login_manager.login_message_category = 'info'
 
-app.config['MAIL_SERVER'] = 'smtp.google.com'
+db = SQLAlchemy()
 
-app.config['MAIL_PORT'] = 587
+bcrypt = Bcrypt()
 
-app.config['MAIL_USE_TLS'] = True
+mail = Mail()
 
-app.config['MAIL_USERNAME'] = 'Godspowereze260@gmail.com'
 
-app.config['MAIL_PASSWORD'] = 'eminentfablous'
+def create_app(config_class=Config):
+    app = Flask(__name__)
 
-mail = Mail(app)
+    app.config.from_object(Config)
 
-from socialmedia import routes
+    from socialmedia.users.routes import users
+
+    from socialmedia.posts.routes import posts
+
+    from socialmedia.main.routes import main
+
+    from socialmedia.errors.handlers import errors
+
+    app.register_blueprint(users)
+
+    app.register_blueprint(posts)
+
+    app.register_blueprint(main)
+
+    app.register_blueprint(errors)
+
+    db.init_app(app)
+
+    bcrypt.init_app(app)
+
+    login_manager.init_app(app)
+
+    mail.init_app(app)
+
+    return app

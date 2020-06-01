@@ -1,32 +1,23 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
+from wtforms.validators import (DataRequired,
+                                ValidationError,
+                                EqualTo,
+                                Length)
 from wtforms import (StringField,
-                     TextAreaField,
                      SubmitField,
                      PasswordField,
                      BooleanField,
-                     SelectField, )
-from flask_wtf.file import FileField, FileAllowed
-from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, Email
+                     SelectField,
+                     TextAreaField)
+
 from socialmedia.models import User
+
 
 choices = (
     ('male', 'Male'),
     ('female', 'Female')
 )
-
-
-class PostCreationForm(FlaskForm):
-    post_title = StringField('Title', validators=[
-        DataRequired(),
-    ])
-    post_content = TextAreaField('Content', validators=[
-        DataRequired()
-    ])
-    post_image = FileField('Profile Picture', validators=[
-        FileAllowed(['jpg', 'png'])
-    ])
-
-    submit = SubmitField('Post')
 
 
 class UserCreationForm(FlaskForm):
@@ -35,8 +26,7 @@ class UserCreationForm(FlaskForm):
         Length(min=2, max=20)
     ])
     email = StringField('Email', validators=[
-        DataRequired(),
-        Email()
+        DataRequired()
     ])
     password = PasswordField('Password', validators=[
         DataRequired()
@@ -60,8 +50,7 @@ class UserCreationForm(FlaskForm):
 
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[
-        DataRequired(),
-        Email()
+        DataRequired()
     ])
     password = PasswordField('Password', validators=[
         DataRequired()
@@ -81,8 +70,7 @@ class AccountInfo(FlaskForm):
         Length(min=2, max=20)
     ])
     email = StringField('Email', validators=[
-        DataRequired(),
-        Email()
+        DataRequired()
     ])
     password = PasswordField('Password', validators=[
         DataRequired()
@@ -98,8 +86,7 @@ class AccountInfo(FlaskForm):
 
 class RequestChangePassword(FlaskForm):
     email = StringField('Email Address', validators=[
-        DataRequired(),
-        Email()
+        DataRequired()
     ])
     submit = SubmitField('Send reset link')
 

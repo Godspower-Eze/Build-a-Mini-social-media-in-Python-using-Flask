@@ -4,15 +4,15 @@
     {{ post_detail.post_title }}
 </h1>
     <div class="container bg-info">
-        <small class="text-right"><img class="rounded-circle pr-2 pt-2" width="50px" src="{{ url_for('static', filename='mypicture.jpg')}}">By {{post_detail.author.username}}</small>
+        <small class="text-right"><img class="rounded-circle pr-2 pt-2" width="50px" src="{{ url_for('posts.static', filename='mypicture.jpg')}}">By {{post_detail.author.username}}</small>
     <h3>{{ post_detail.post_title}}</h3>
         <hr color="black">
     <p class="lead">
         {{ post_detail.post_content }}
     </p>
         {% if post_detail.author.id == current_user.id %}
-            <a class="btn btn-warning mr-2 mb-2" href="{{url_for('update', post_id=post_detail.id)}}">Update</a>
-            <a class="btn btn-danger mb-2" href="{{url_for('delete', post_id=post_detail.id)}}">Delete</a>
+            <a class="btn btn-warning mr-2 mb-2" href="{{url_for('posts.update', post_id=post_detail.id)}}">Update</a>
+            <a class="btn btn-danger mb-2" href="{{url_for('posts.delete', post_id=post_detail.id)}}">Delete</a>
         {% endif %}
      </div>
 {% endblock %}

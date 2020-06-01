@@ -8,7 +8,7 @@
     {% for p in posts.items %}
     <div class="container bg-info">
         <small class="text-right"><img class="rounded-circle pr-2 pt-2" width="50px" src="{{ url_for('static', filename='mypicture.jpg')}}">By {{p.author.username}}</small>
-        <h3><a href="{{ url_for('detail_view', user_id=p.id)}}">{{ p.post_title}}</a></h3>
+        <h3><a href="{{ url_for('posts.detail_view', user_id=p.id)}}">{{ p.post_title}}</a></h3>
         {% if p.post_image%}
         <div>
             <img class="container" src="/static/post_image/{{p.post_image}}">
@@ -25,7 +25,7 @@
 <div class="container">
 {% for page_num in posts.iter_pages() %}
         {% if page_num %}
-            <a class="btn btn-info m-2" href="{{url_for('home', page=page_num)}}">
+            <a class="btn btn-info m-2" href="{{url_for('main.home', page=page_num)}}">
                 {{ page_num }}
             </a>
         {% endif %}
